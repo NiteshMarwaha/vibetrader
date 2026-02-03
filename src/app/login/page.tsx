@@ -26,13 +26,40 @@ export default function LoginPage() {
       });
 
       if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || "Unable to log in.");
+        let errorMessage = "Unable to log in.";
+        try {
+          const fallbackText = await response.text();
+          if (fallbackText) {
+            try {
+              const data = JSON.parse(fallbackText);
+              if (data?.error) {
+                errorMessage = data.error;
+              } else {
+                errorMessage = fallbackText;
+              }
+            } catch (parseError) {
+              errorMessage = fallbackText;
+              console.error("Login error response parsing failed", parseError);
+            }
+          }
+        } catch (readError) {
+          console.error("Login error response read failed", readError);
+        }
+        console.error("Login request failed", {
+          status: response.status,
+          statusText: response.statusText,
+        });
+        throw new Error(errorMessage);
       }
 
       router.push("/dashboard");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Unable to log in.");
+      console.error("Login failed", err);
+      setError(
+        err instanceof Error
+          ? err.message
+          : `Unable to log in. Check that the API is reachable at ${API_URL}.`
+      );
     } finally {
       setLoading(false);
     }
