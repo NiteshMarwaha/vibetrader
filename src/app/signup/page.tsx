@@ -27,13 +27,40 @@ export default function SignupPage() {
       });
 
       if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || "Unable to sign up.");
+        let errorMessage = "Unable to sign up.";
+        try {
+          const fallbackText = await response.text();
+          if (fallbackText) {
+            try {
+              const data = JSON.parse(fallbackText);
+              if (data?.error) {
+                errorMessage = data.error;
+              } else {
+                errorMessage = fallbackText;
+              }
+            } catch (parseError) {
+              errorMessage = fallbackText;
+              console.error("Signup error response parsing failed", parseError);
+            }
+          }
+        } catch (readError) {
+          console.error("Signup error response read failed", readError);
+        }
+        console.error("Signup request failed", {
+          status: response.status,
+          statusText: response.statusText,
+        });
+        throw new Error(errorMessage);
       }
 
       router.push("/dashboard");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Unable to sign up.");
+      console.error("Signup failed", err);
+      setError(
+        err instanceof Error
+          ? err.message
+          : `Unable to sign up. Check that the API is reachable at ${API_URL}.`
+      );
     } finally {
       setLoading(false);
     }
