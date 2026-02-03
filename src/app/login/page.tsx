@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { API_URL } from "@/lib/config";
+import { API_BASE_URL } from "@/lib/config";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -18,7 +18,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const response = await fetch(`${API_URL}/api/auth/login`, {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -58,7 +58,7 @@ export default function LoginPage() {
       setError(
         err instanceof Error
           ? err.message
-          : `Unable to log in. Check that the API is reachable at ${API_URL}.`
+          : `Unable to log in. Check that the API is reachable at ${API_BASE_URL}.`
       );
     } finally {
       setLoading(false);

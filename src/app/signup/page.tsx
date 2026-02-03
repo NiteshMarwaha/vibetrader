@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { API_URL } from "@/lib/config";
+import { API_BASE_URL } from "@/lib/config";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -19,7 +19,7 @@ export default function SignupPage() {
     setLoading(true);
 
     try {
-      const response = await fetch(`${API_URL}/api/auth/signup`, {
+      const response = await fetch(`${API_BASE_URL}/auth/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -59,7 +59,7 @@ export default function SignupPage() {
       setError(
         err instanceof Error
           ? err.message
-          : `Unable to sign up. Check that the API is reachable at ${API_URL}.`
+          : `Unable to sign up. Check that the API is reachable at ${API_BASE_URL}.`
       );
     } finally {
       setLoading(false);
