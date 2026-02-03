@@ -3,7 +3,9 @@
 import { useEffect, useMemo, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import Link from "next/link";
-import { API_URL } from "@/lib/config";
+
+import { API_BASE_URL } from "@/lib/config";
+
 import { Trade, TradeInput, createTrade, fetchTrades } from "@/lib/trades";
 
 type User = {
@@ -60,7 +62,7 @@ export default function DashboardPage() {
   useEffect(() => {
     const load = async () => {
       try {
-        const response = await fetch(`${API_URL}/api/auth/me`, {
+        const response = await fetch(`${API_BASE_URL}/auth/me`, {
           credentials: "include",
         });
 
@@ -71,7 +73,7 @@ export default function DashboardPage() {
         const data = await response.json();
         setUser(data.user);
 
-        const dashboardResponse = await fetch(`${API_URL}/api/dashboard`, {
+        const dashboardResponse = await fetch(`${API_BASE_URL}/dashboard`, {
           credentials: "include",
         });
         if (dashboardResponse.ok) {

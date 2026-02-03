@@ -1,4 +1,4 @@
-import { API_URL } from "@/lib/config";
+import { API_BASE_URL } from "@/lib/config";
 
 export type Trade = {
   id: string;
@@ -29,10 +29,12 @@ export type TradeInput = {
   externalId?: string;
 };
 
-const buildUrl = (path: string) => `${API_URL}${path}`;
+
+const buildUrl = (path: string) => `${API_BASE_URL}${path}`;
 
 export const fetchTrades = async () => {
-  const response = await fetch(buildUrl("/api/trades"), {
+  const response = await fetch(buildUrl("/trades"), {
+
     credentials: "include",
   });
 
@@ -45,7 +47,8 @@ export const fetchTrades = async () => {
 };
 
 export const createTrade = async (payload: TradeInput) => {
-  const response = await fetch(buildUrl("/api/trades"), {
+  const response = await fetch(buildUrl("/trades"), {
+
     method: "POST",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
