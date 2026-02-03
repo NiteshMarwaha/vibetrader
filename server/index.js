@@ -66,6 +66,70 @@ const requireAuth = async (req, res, next) => {
   }
 };
 
+const parseNumberField = (value, fieldName) => {
+  const numberValue = Number(value);
+  if (!Number.isFinite(numberValue)) {
+    throw new Error(`${fieldName} must be a valid number.`);
+  }
+  return numberValue;
+};
+
+const parseTradePayload = (payload = {}) => {
+  const symbol = String(payload.symbol || "").trim().toUpperCase();
+  if (!symbol) {
+    throw new Error("Symbol is required.");
+  }
+
+  const entryPrice = parseNumberField(payload.entryPrice, "Entry price");
+  const exitPrice = parseNumberField(payload.exitPrice, "Exit price");
+  const quantity = parseNumberField(payload.quantity, "Quantity");
+  const pnl = parseNumberField(payload.pnl, "PnL");
+
+  const tradeDate = new Date(payload.tradeDate);
+  if (Number.isNaN(tradeDate.getTime())) {
+    throw new Error("Trade date is invalid.");
+  }
+
+  const goodNotes = payload.goodNotes ? String(payload.goodNotes).trim() : null;
+  const badNotes = payload.badNotes ? String(payload.badNotes).trim() : null;
+  const source = payload.source === "BROKER" ? "BROKER" : "MANUAL";
+  const broker = payload.broker ? String(payload.broker).trim() : null;
+  const externalId = payload.externalId ? String(payload.externalId).trim() : null;
+
+  return {
+    symbol,
+    entryPrice,
+    exitPrice,
+    quantity: Math.trunc(quantity),
+    pnl,
+    tradeDate,
+    goodNotes,
+    badNotes,
+    source,
+    broker,
+    externalId,
+  };
+};
+
+const formatTrade = (trade) => ({
+  id: trade.id,
+  symbol: trade.symbol,
+  entryPrice: trade.entryPrice?.toNumber
+    ? trade.entryPrice.toNumber()
+    : Number(trade.entryPrice),
+  exitPrice: trade.exitPrice?.toNumber
+    ? trade.exitPrice.toNumber()
+    : Number(trade.exitPrice),
+  quantity: trade.quantity,
+  pnl: trade.pnl?.toNumber ? trade.pnl.toNumber() : Number(trade.pnl),
+  tradeDate: trade.tradeDate,
+  goodNotes: trade.goodNotes,
+  badNotes: trade.badNotes,
+  source: trade.source,
+  broker: trade.broker,
+  externalId: trade.externalId,
+});
+
 app.post("/api/auth/signup", async (req, res) => {
   const { email, password, name } = req.body || {};
 
@@ -159,6 +223,44 @@ app.get("/api/dashboard", requireAuth, (req, res) => {
   return res.status(200).json({
     message: `Welcome back, ${req.user.name || req.user.email}.`,
   });
+});
+
+app.get("/api/trades", requireAuth, async (req, res) => {
+  const trades = await prisma.trade.findMany({
+    where: { userId: req.user.id },
+    orderBy: { tradeDate: "desc" },
+  });
+
+  return res.status(200).json({ trades: trades.map(formatTrade) });
+});
+
+app.post("/api/trades", requireAuth, async (req, res) => {
+  try {
+    const tradeInput = parseTradePayload(req.body);
+
+    const trade = await prisma.trade.create({
+      data: {
+        userId: req.user.id,
+        symbol: tradeInput.symbol,
+        entryPrice: tradeInput.entryPrice,
+        exitPrice: tradeInput.exitPrice,
+        quantity: tradeInput.quantity,
+        pnl: tradeInput.pnl,
+        tradeDate: tradeInput.tradeDate,
+        goodNotes: tradeInput.goodNotes,
+        badNotes: tradeInput.badNotes,
+        source: tradeInput.source,
+        broker: tradeInput.broker,
+        externalId: tradeInput.externalId,
+      },
+    });
+
+    return res.status(201).json({ trade: formatTrade(trade) });
+  } catch (error) {
+    return res.status(400).json({
+      error: error instanceof Error ? error.message : "Invalid trade payload.",
+    });
+  }
 });
 
 app.listen(PORT, () => {

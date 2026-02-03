@@ -1,2 +1,3 @@
-export const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "/api";
+export const BACKEND_URL =
+  process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
