@@ -8,7 +8,7 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const app = express();
 
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 3000;
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
 const JWT_SECRET = process.env.JWT_SECRET || "change-me";
 const COOKIE_NAME = "auth_token";
