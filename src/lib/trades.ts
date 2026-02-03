@@ -29,10 +29,12 @@ export type TradeInput = {
   externalId?: string;
 };
 
+
 const buildUrl = (path: string) => `${API_BASE_URL}${path}`;
 
 export const fetchTrades = async () => {
   const response = await fetch(buildUrl("/trades"), {
+
     credentials: "include",
   });
 
@@ -46,6 +48,7 @@ export const fetchTrades = async () => {
 
 export const createTrade = async (payload: TradeInput) => {
   const response = await fetch(buildUrl("/trades"), {
+
     method: "POST",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
