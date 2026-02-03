@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import Link from "next/link";
-
 import { API_BASE_URL } from "@/lib/config";
 
 import { Trade, TradeInput, createTrade, fetchTrades } from "@/lib/trades";

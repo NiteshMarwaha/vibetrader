@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { API_BASE_URL } from "@/lib/config";
+import { API_BASE_URL, BACKEND_URL } from "@/lib/config";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -59,7 +59,8 @@ export default function SignupPage() {
       setError(
         err instanceof Error
           ? err.message
-          : `Unable to sign up. Check that the API is reachable at ${API_BASE_URL}.`
+          : `Unable to sign up. Ensure the API server is running at ${BACKEND_URL}.`
+
       );
     } finally {
       setLoading(false);
