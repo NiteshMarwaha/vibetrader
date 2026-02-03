@@ -12,6 +12,11 @@ enum AuthProviderType {
   GOOGLE
 }
 
+enum TradeSource {
+  MANUAL
+  BROKER
+}
+
 model User {
   id        String          @id @default(uuid())
   email     String          @unique
@@ -19,6 +24,7 @@ model User {
   createdAt DateTime        @default(now())
   updatedAt DateTime        @updatedAt
   providers AuthProvider[]
+  trades    Trade[]
 }
 
 model AuthProvider {
@@ -34,4 +40,26 @@ model AuthProvider {
 
   @@unique([provider, providerUserId])
   @@unique([provider, userId])
+}
+
+model Trade {
+  id         String      @id @default(uuid())
+  userId     String
+  symbol     String
+  entryPrice Decimal
+  exitPrice  Decimal
+  quantity   Int
+  pnl        Decimal
+  tradeDate  DateTime
+  goodNotes  String?
+  badNotes   String?
+  source     TradeSource @default(MANUAL)
+  broker     String?
+  externalId String?
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, tradeDate])
 }
