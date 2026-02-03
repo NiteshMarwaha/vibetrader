@@ -23,7 +23,12 @@ export function SiteHeader() {
             </Link>
           </nav>
           <ThemeToggle />
-          <Button size="sm">Request access</Button>
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/login">Log in</Link>
+          </Button>
+          <Button size="sm" asChild>
+            <Link href="/signup">Sign up</Link>
+          </Button>
         </div>
       </div>
     </header>
