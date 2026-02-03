@@ -60,6 +60,7 @@ export default function SignupPage() {
         err instanceof Error
           ? err.message
           : `Unable to sign up. Ensure the API server is running at ${BACKEND_URL}.`
+
       );
     } finally {
       setLoading(false);
